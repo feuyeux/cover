@@ -17,17 +17,16 @@
         </c:if>
 
 
-        <c:if test="${fn:length(attributes) > 0}">
+        <c:if test="${fn:length(assertion.chainedAuthentications[fn:length(assertion.chainedAuthentications)-1].principal.attributes)> 0}">
             <cas:attributes>
-                <c:forEach var="attr"
-                           items="${attributes}"
-                           varStatus="loopStatus" begin="0"
-                           end="${fn:length(attributes)}"
-                           step="1">
-
-                    <c:forEach var="attrval" items="${attr.value}">
-                        <cas:${fn:escapeXml(attr.key)}>${fn:escapeXml(attrval)}</cas:${fn:escapeXml(attr.key)}>
-                    </c:forEach>
+                <c:forEach
+                        var="attr"
+                        items="${assertion.chainedAuthentications[fn:length(assertion.chainedAuthentications)-1].principal.attributes}"
+                        varStatus="loopStatus"
+                        begin="0"
+                        end="${fn:length(assertion.chainedAuthentications[fn:length(assertion.chainedAuthentications)-1].principal.attributes)-1}"
+                        step="1">
+                    <cas:${fn:escapeXml(attr.key)}>${fn:escapeXml(attr.value)}</cas:${fn:escapeXml(attr.key)}>
                 </c:forEach>
             </cas:attributes>
         </c:if>

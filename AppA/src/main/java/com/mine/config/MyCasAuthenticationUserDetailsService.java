@@ -23,8 +23,8 @@ public class MyCasAuthenticationUserDetailsService implements AuthenticationUser
         }
 
         System.out.println("authorites:\t"+((CasAssertionAuthenticationToken) token).getAssertion().getPrincipal().getAttributes().get("authorities"));
-        System.out.println("allow:\t"+((CasAssertionAuthenticationToken) token).getAssertion().getPrincipal().getAttributes().get("allow"));
-        System.out.println("deny:\t"+((CasAssertionAuthenticationToken) token).getAssertion().getPrincipal().getAttributes().get("deny"));
+        System.out.println("allow:\t"+((CasAssertionAuthenticationToken) token).getAssertion().getPrincipal().getAttributes().get("ruleallow"));
+        System.out.println("deny:\t"+((CasAssertionAuthenticationToken) token).getAssertion().getPrincipal().getAttributes().get("ruledeny"));
 
         User user =new User(token.getName(), "", authorities);
         System.out.println(user.toString() + "+" + token.getCredentials() + "+" + token.getDetails() + "+" + token.getPrincipal());

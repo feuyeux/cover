@@ -45,13 +45,15 @@
             </list>
         </entry>
     </util:map>
+
     <bean id="attributeRepository" class="org.jasig.services.persondir.support.jdbc.SingleRowJdbcPersonAttributeDao">
         <constructor-arg index="0" ref="dataSource"/>
-        <constructor-arg index="1" value="select role_name,rule_allow,rule_deny from t_admin_user where login_name = ?" />
+        <!--<constructor-arg index="1" value="select roleName,ruleAllow,ruleDeny from tAdminUser where loginName = ?" />-->
+        <constructor-arg index="1" value="select rolename,ruleallow,ruledeny from tAdminUser where {0}" />
         <!--这里的key需写username,value对应数据库用户名字段 -->
         <property name="queryAttributeMapping">
             <map>
-                <entry key="username" value="login_name"/>
+                <entry key="username" value="loginname"/>
             </map>
         </property>
         <!--key对应数据库字段，value对应客户端获取参数 -->
@@ -59,9 +61,9 @@
         <property name="resultAttributeMapping">
             <map>
                 <!--这个从数据库中获取的角色，用于在应用中security的权限验证-->
-                <entry key="role_name" value="authorities"/>
-                <entry value="allow" key="rule_allow"/>
-                <entry value="deny" key="rule_deny"/>
+                <entry key="rolename" value="authorities"/>
+                <entry value="ruleallow" key="ruleallow"/>
+                <entry value="ruledeny" key="ruledeny"/>
             </map>
         </property>
     </bean>
