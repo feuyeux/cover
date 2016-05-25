@@ -68,8 +68,6 @@
 
     <!--<property name="attributeRepository" ref="attributeRepository" />-->
 
-
-
     <alias name="serviceThemeResolver" alias="themeResolver" />
 
     <alias name="jsonServiceRegistryDao" alias="serviceRegistryDao" />
@@ -124,15 +122,13 @@
             <value>com.mysql.jdbc.Driver</value>
         </property>
         <property name="url">
-            <value>jdbc:mysql://mySqlServer:3306/sso?useUnicode=true&amp;characterEncoding=utf-8</value>
+            <value>jdbc:mysql://iplus.mysql.rdstest.tbsite.net:3306/given?useUnicode=true&amp;characterEncoding=utf-8</value>
         </property>
         <property name="username">
-            <value>root</value>
+            <value>firstcloud</value>
         </property>
         <property name="password">
-            <value>123456</value>
+            <value>firstcloud</value>
         </property>
     </bean>
-
-
 </beans>
