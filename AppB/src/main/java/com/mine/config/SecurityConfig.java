@@ -25,16 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // @formatter:off
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication()
-                .withUser("user").password("password").roles("USER").and()
-                .withUser("admin").password("password").roles("USER", "ADMIN").and()
-                .withUser("joe").password("joe").roles("USER");
-//        auth
-//                .userDetailsService(userDetailsService)
-//                .passwordEncoder(new BCryptPasswordEncoder());
-        auth
-                .authenticationProvider(casAuthenticationProvider());
+        auth .authenticationProvider(casAuthenticationProvider());
     }
     // @formatter:on
 
@@ -42,8 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // @formatter:off
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .addFilter(casAuthenticationFilter());
+        http .addFilter(casAuthenticationFilter());
 
         http
                 .authorizeRequests()
@@ -51,15 +41,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/users/**").hasAnyRole("USER")
                 .antMatchers("/user/**").hasAnyAuthority("ROLE_TEST")
                 .anyRequest().fullyAuthenticated()
-//                .anyRequest().authenticated()
                 .and()
                 .formLogin()
-//				.loginPage("/login")
                 .permitAll()
                 .and()
                 .rememberMe()
         ;
-
 
         http
                 .exceptionHandling()
@@ -68,16 +55,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     // @formatter:on
 
-//
-//    @Bean
-//    public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
-//        return new SecurityEvaluationContextExtension();
-//    }
 
     @Bean
     public ServiceProperties serviceProperties() {
         ServiceProperties serviceProperties = new ServiceProperties();
-//        serviceProperties.setService("https://localhost:8443/cas/j_spring_cas_security_check");
         serviceProperties.setService("https://localhost:"+port+"/j_spring_cas_security_check");
         serviceProperties.setSendRenew(false);
         return serviceProperties;
@@ -95,8 +76,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationUserDetailsService authenticationUserDetailsService() {
-//        String []  authorities = new String[]{"ROLE_TEST"};
-//        AuthenticationUserDetailsService authenticationUserDetailsService = new GrantedAuthorityFromAssertionAttributesUserDetailsService(authorities);
         return new MyCasAuthenticationUserDetailsService();
     }
 

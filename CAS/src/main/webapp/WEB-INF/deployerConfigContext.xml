@@ -26,9 +26,6 @@
         <ref bean="rememberMeAuthenticationMetaDataPopulator" />
     </util:list>
 
-    <!--<bean id="attributeRepository" class="org.jasig.services.persondir.support.NamedStubPersonAttributeDao"-->
-          <!--p:backingMap-ref="attrRepoBackingMap" />-->
-
     <alias name="queryDatabaseAuthenticationHandler" alias="primaryAuthenticationHandler" />
     <alias name="personDirectoryPrincipalResolver" alias="primaryPrincipalResolver" />
 
@@ -50,7 +47,7 @@
         <constructor-arg index="0" ref="dataSource"/>
         <!--<constructor-arg index="1" value="select roleName,ruleAllow,ruleDeny from tAdminUser where loginName = ?" />-->
         <constructor-arg index="1" value="select rolename,ruleallow,ruledeny from tAdminUser where {0}" />
-        <!--这里的key需写username,value对应数据库用户名字段 -->
+        <!--这里的key必须写username,value对应数据库用户名字段 -->
         <property name="queryAttributeMapping">
             <map>
                 <entry key="username" value="loginname"/>
@@ -67,8 +64,6 @@
             </map>
         </property>
     </bean>
-
-    <!--<property name="attributeRepository" ref="attributeRepository" />-->
 
     <alias name="serviceThemeResolver" alias="themeResolver" />
 
@@ -99,24 +94,8 @@
     <alias name="defaultPrincipalElectionStrategy" alias="principalElectionStrategy" />
     <alias name="tgcCipherExecutor" alias="defaultCookieCipherExecutor" />
 
-
-
-    <!--<alias name="defaultPasswordEncoder" alias="passwordEncoder" />-->
-
-    <!--<bean id="primaryPrincipalResolver" class="org.jasig.cas.adaptors.jdbc.QueryDatabaseAuthenticationHandler">-->
-        <!--<property name="dataSource" ref="queryDatabaseDataSource"/>-->
-        <!--<property name="sql" value="select password from t_admin_user where login_name=?"/>-->
-        <!--&lt;!&ndash;<property name="passwordEncoder" ref="passwordEncoder"/>&ndash;&gt;-->
-    <!--</bean>-->
-
     <alias name="dataSource" alias="queryDatabaseDataSource" />
     <alias name="dataSource" alias="queryEncodeDatabaseDataSource" />
-    <!--<bean id="dataSource"-->
-          <!--class="com.mchange.v2.c3p0.ComboPooledDataSource"-->
-          <!--p:driverClass="com.mysql.jdbc.Driver"-->
-          <!--p:jdbcUrl="jdbc:mysql://mySqlServer:3306/sso?useUnicode=true&amp;characterEncoding=UTF-8"-->
-          <!--p:user="root"-->
-          <!--p:password="123456" />-->
 
     <!-- DATABASE 增加数据源配置 -->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
