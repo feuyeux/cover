@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+    <util:map id="authenticationHandlersResolvers">
+        <entry key-ref="proxyAuthenticationHandler" value-ref="proxyPrincipalResolver" />
+        <entry key-ref="primaryAuthenticationHandler" value-ref="primaryPrincipalResolver" />
+    </util:map>
+
+    <util:list id="authenticationMetadataPopulators">
+        <ref bean="successfulHandlerMetaDataPopulator" />
+        <ref bean="rememberMeAuthenticationMetaDataPopulator" />
+    </util:list>
+
+    <!--<bean id="attributeRepository" class="org.jasig.services.persondir.support.NamedStubPersonAttributeDao"-->
+          <!--p:backingMap-ref="attrRepoBackingMap" />-->
+
+    <alias name="queryDatabaseAuthenticationHandler" alias="primaryAuthenticationHandler" />
+    <alias name="personDirectoryPrincipalResolver" alias="primaryPrincipalResolver" />
+
+    <util:map id="attrRepoBackingMap">
+        <entry key="uid" value="uid" />
+        <entry key="eduPersonAffiliation" value="eduPersonAffiliation" />
+        <entry key="groupMembership" value="groupMembership" />
+        <entry>
+            <key><value>memberOf</value></key>
+            <list>
+                <value>faculty</value>
+                <value>staff</value>
+                <value>org</value>
+            </list>
+        </entry>
+    </util:map>
+    <bean id="attributeRepository" class="org.jasig.services.persondir.support.jdbc.SingleRowJdbcPersonAttributeDao">
+        <constructor-arg index="0" ref="dataSource"/>
+        <constructor-arg index="1" value="select role_name,rule_allow,rule_deny from t_admin_user where login_name = ?" />
+        <!--这里的key需写username,value对应数据库用户名字段 -->
+        <property name="queryAttributeMapping">
+            <map>
+                <entry key="username" value="login_name"/>
+            </map>
+        </property>
+        <!--key对应数据库字段，value对应客户端获取参数 -->
+        <!-- 返回数据认证后的数据 -->
+        <property name="resultAttributeMapping">
+            <map>
+                <!--这个从数据库中获取的角色，用于在应用中security的权限验证-->
+                <entry key="role_name" value="authorities"/>
+                <entry value="allow" key="rule_allow"/>
+                <entry value="deny" key="rule_deny"/>
+            </map>
+        </property>
+    </bean>
+
+    <!--<property name="attributeRepository" ref="attributeRepository" />-->
+
+
+
+    <alias name="serviceThemeResolver" alias="themeResolver" />
+
+    <alias name="jsonServiceRegistryDao" alias="serviceRegistryDao" />
+
+    <alias name="defaultTicketRegistry" alias="ticketRegistry" />
+
+    <alias name="ticketGrantingTicketExpirationPolicy" alias="grantingTicketExpirationPolicy" />
+    <alias name="multiTimeUseOrTimeoutExpirationPolicy" alias="serviceTicketExpirationPolicy" />
+
+    <alias name="anyAuthenticationPolicy" alias="authenticationPolicy" />
+    <alias name="acceptAnyAuthenticationPolicyFactory" alias="authenticationPolicyFactory" />
+
+    <bean id="auditTrailManager"
+          class="org.jasig.inspektr.audit.support.Slf4jLoggingAuditTrailManager"
+          p:entrySeparator="${cas.audit.singleline.separator:|}"
+          p:useSingleLine="${cas.audit.singleline:false}"/>
+
+    <alias name="neverThrottle" alias="authenticationThrottle" />
+
+    <util:list id="monitorsList">
+        <ref bean="memoryMonitor" />
+        <ref bean="sessionMonitor" />
+    </util:list>
+
+    <alias name="defaultPrincipalFactory" alias="principalFactory" />
+    <alias name="defaultAuthenticationTransactionManager" alias="authenticationTransactionManager" />
+    <alias name="defaultPrincipalElectionStrategy" alias="principalElectionStrategy" />
+    <alias name="tgcCipherExecutor" alias="defaultCookieCipherExecutor" />
+
+
+
+    <!--<alias name="defaultPasswordEncoder" alias="passwordEncoder" />-->
+
+    <!--<bean id="primaryPrincipalResolver" class="org.jasig.cas.adaptors.jdbc.QueryDatabaseAuthenticationHandler">-->
+        <!--<property name="dataSource" ref="queryDatabaseDataSource"/>-->
+        <!--<property name="sql" value="select password from t_admin_user where login_name=?"/>-->
+        <!--&lt;!&ndash;<property name="passwordEncoder" ref="passwordEncoder"/>&ndash;&gt;-->
+    <!--</bean>-->
+
+    <alias name="dataSource" alias="queryDatabaseDataSource" />
+    <alias name="dataSource" alias="queryEncodeDatabaseDataSource" />
+    <!--<bean id="dataSource"-->
+          <!--class="com.mchange.v2.c3p0.ComboPooledDataSource"-->
+          <!--p:driverClass="com.mysql.jdbc.Driver"-->
+          <!--p:jdbcUrl="jdbc:mysql://mySqlServer:3306/sso?useUnicode=true&amp;characterEncoding=UTF-8"-->
+          <!--p:user="root"-->
+          <!--p:password="123456" />-->
+
+    <!-- DATABASE 增加数据源配置 -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName">
+            <value>com.mysql.jdbc.Driver</value>
+        </property>
+        <property name="url">
+            <value>jdbc:mysql://mySqlServer:3306/sso?useUnicode=true&amp;characterEncoding=utf-8</value>
+        </property>
+        <property name="username">
+            <value>root</value>
+        </property>
+        <property name="password">
+            <value>123456</value>
+        </property>
+    </bean>
+
+
+</beans>
