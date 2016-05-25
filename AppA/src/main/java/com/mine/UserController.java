@@ -26,7 +26,6 @@ public class UserController {
 
         User u2 = new User(id + 1, "wang");
 
-
         list.add(user);
         list.add(u2);
 
@@ -55,7 +54,6 @@ public class UserController {
     }
 
     @GET
-    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String test(){
         return "Hi. Hi. Hi";

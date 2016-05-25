@@ -18,25 +18,21 @@ import org.springframework.security.core.userdetails.AuthenticationUserDetailsSe
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Value("${app.server}")
+    private String appServer;
 
-    @Value("${server.port:8019}")
-    private String port;
+    @Value("${cas.server}")
+    private String casServer;
 
-    // @formatter:off
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(casAuthenticationProvider());
     }
-    // @formatter:on
 
-
-    // @formatter:off
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilter(casAuthenticationFilter());
-
-        http
-                .authorizeRequests()
+        http.authorizeRequests()
                 .antMatchers("/", "/public/**").permitAll()
                 .antMatchers("/users/**").hasAnyRole("USER")
                 .antMatchers("/user/**").hasAnyAuthority("ROLE_TEST")
@@ -45,20 +41,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .permitAll()
                 .and()
-                .rememberMe()
-        ;
-
-        http
-                .exceptionHandling()
-                .authenticationEntryPoint(casAuthenticationEntryPoint());
-
+                .rememberMe();
+        http.exceptionHandling().authenticationEntryPoint(casAuthenticationEntryPoint());
     }
-    // @formatter:on
 
     @Bean
     public ServiceProperties serviceProperties() {
         ServiceProperties serviceProperties = new ServiceProperties();
-        serviceProperties.setService("https://localhost:" + port + "/j_spring_cas_security_check");
+        serviceProperties.setService(appServer + "/j_spring_cas_security_check");
         serviceProperties.setSendRenew(false);
         return serviceProperties;
     }
@@ -80,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public Cas20ServiceTicketValidator cas20ServiceTicketValidator() {
-        return new Cas20ServiceTicketValidator("https://localhost:8443/cas");
+        return new Cas20ServiceTicketValidator(casServer);
     }
 
     @Bean
@@ -94,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CasAuthenticationEntryPoint casAuthenticationEntryPoint() {
         CasAuthenticationEntryPoint casAuthenticationEntryPoint = new CasAuthenticationEntryPoint();
-        casAuthenticationEntryPoint.setLoginUrl("https://localhost:8443/cas/login");
+        casAuthenticationEntryPoint.setLoginUrl(casServer + "/login");
         casAuthenticationEntryPoint.setServiceProperties(serviceProperties());
         return casAuthenticationEntryPoint;
     }

@@ -112,15 +112,11 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.1</version>
         </dependency>
-
-
         <dependency>
         <groupId>org.jasig.cas</groupId>
         <artifactId>cas-server-core-util</artifactId>
         <version>4.2.2</version>
         </dependency>
-
-
     </dependencies>
 
     <properties>

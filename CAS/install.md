@@ -15,7 +15,7 @@ cp .keystore /opt/tomcat-7.0.67/keystore
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                clientAuth="false" sslProtocol="TLS"
                keystoreFile="keystore" keystorePass="123456"
-               truststoreFile="/usr/java/jdk1.8.0_65/jre/lib/security/cacerts"
+               truststoreFile="/usr/java/jdk1.7.0_80/jre/lib/security/cacerts"
     />
 ```
 # 修改
