@@ -17,6 +17,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +67,9 @@ public class UserController {
         WebTarget target = c.target("https://localhost:8013/user").queryParam("id", id);
 
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON_TYPE);
-        request.header("appAAA", buildHead());
-        for(Cookie cookie:httpRequest.getCookies()) {
-            request.cookie(cookie.getName(), cookie.getValue());
-        }
-        User user = request.get().readEntity(User.class);
+        request.header("msPrincipal",httpRequest.getUserPrincipal());
+        Response response = request.get();
+        User user = response.readEntity(User.class);
         return user;
     }
 
