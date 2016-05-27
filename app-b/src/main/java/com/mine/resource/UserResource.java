@@ -1,9 +1,7 @@
 package com.mine.resource;
 
 import com.mine.domain.AppUser;
-import org.jasig.cas.client.authentication.AttributePrincipal;
-import org.springframework.security.cas.authentication.CasAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,7 +30,7 @@ public class UserResource {
     @Path("/users")
     @Produces(MediaType.APPLICATION_JSON)
     public List<AppUser> views(@QueryParam("id") @DefaultValue("5") int id, @QueryParam("inputName") @RequestParam(required = false) String name) {
-        System.out.println(buildHead());
+//        System.out.println(buildHead());
 
         ArrayList<AppUser> list = new ArrayList();
         AppUser appUser = new AppUser();
@@ -58,13 +56,13 @@ public class UserResource {
     @GET
     @Path("/hi")
     public String hi() {
-        System.out.println(buildHead());
+//        System.out.println(buildHead());
         return "Hi. Hi. Hi";
     }
 
-    public Map<String, Object> buildHead() {
-        CasAuthenticationToken casAuthenticationToken = (CasAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        AttributePrincipal principal = casAuthenticationToken.getAssertion().getPrincipal();
-        return principal.getAttributes();
-    }
+//    public Map<String, Object> buildHead() {
+//        CasAuthenticationToken casAuthenticationToken = (CasAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+//        AttributePrincipal principal = casAuthenticationToken.getAssertion().getPrincipal();
+//        return principal.getAttributes();
+//    }
 }

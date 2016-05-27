@@ -26,9 +26,6 @@
         <ref bean="rememberMeAuthenticationMetaDataPopulator" />
     </util:list>
 
-    <!--<bean id="attributeRepository" class="org.jasig.services.persondir.support.NamedStubPersonAttributeDao"-->
-          <!--p:backingMap-ref="attrRepoBackingMap" />-->
-
     <alias name="queryDatabaseAuthenticationHandler" alias="primaryAuthenticationHandler" />
     <alias name="personDirectoryPrincipalResolver" alias="primaryPrincipalResolver" />
 
@@ -50,7 +47,7 @@
         <constructor-arg index="0" ref="dataSource"/>
         <!--<constructor-arg index="1" value="select roleName,ruleAllow,ruleDeny from tAdminUser where loginName = ?" />-->
         <constructor-arg index="1" value="select rolename,ruleallow,ruledeny from tAdminUser where {0}" />
-        <!--这里的key需写username,value对应数据库用户名字段 -->
+        <!--这里的key必须写username,value对应数据库用户名字段 -->
         <property name="queryAttributeMapping">
             <map>
                 <entry key="username" value="loginname"/>
@@ -67,8 +64,6 @@
             </map>
         </property>
     </bean>
-
-    <!--<property name="attributeRepository" ref="attributeRepository" />-->
 
     <alias name="serviceThemeResolver" alias="themeResolver" />
 
