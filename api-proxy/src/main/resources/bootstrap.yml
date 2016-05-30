@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: api-proxy
+  cloud:
+    zookeeper:
+      connectString: localhost:2181

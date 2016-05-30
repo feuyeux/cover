@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.cas.ServiceProperties;
 import org.springframework.security.cas.authentication.CasAuthenticationProvider;
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint;
@@ -18,8 +19,8 @@ import org.springframework.security.core.userdetails.AuthenticationUserDetailsSe
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Value("${app.server}")
-    private String appServer;
+    @Value("${api.server}")
+    private String apiServer;
 
     @Value("${cas.server}")
     private String casServer;
@@ -32,29 +33,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilter(casAuthenticationFilter());
-        http.authorizeRequests()
-                .antMatchers("/", "/public/**").permitAll()
-                .antMatchers("/users/**").hasAnyRole("USER")
-                .antMatchers("/user/**","/hi/**").hasAnyAuthority("ROLE_TEST")
-                .anyRequest().fullyAuthenticated()
-                .and()
-                .formLogin()
-                .permitAll()
-                .and()
-                .rememberMe();
+        http.authorizeRequests().antMatchers("/rest/**").authenticated();
+        http.authorizeRequests().antMatchers("/health/**").permitAll();
         http.exceptionHandling().authenticationEntryPoint(casAuthenticationEntryPoint());
+    }
+
+    @Bean
+    public CasAuthenticationFilter casAuthenticationFilter() throws Exception {
+        CasAuthenticationFilter casAuthenticationFilter = new CasAuthenticationFilter();
+        casAuthenticationFilter.setAuthenticationManager(authenticationManager());
+        casAuthenticationFilter.setFilterProcessesUrl("/j_spring_cas_security_check");
+        return casAuthenticationFilter;
     }
 
     @Bean
     public ServiceProperties serviceProperties() {
         ServiceProperties serviceProperties = new ServiceProperties();
-        serviceProperties.setService(appServer + "/j_spring_cas_security_check");
+        serviceProperties.setService(apiServer + "/j_spring_cas_security_check");
         serviceProperties.setSendRenew(false);
         return serviceProperties;
     }
 
     @Bean
-    public CasAuthenticationProvider casAuthenticationProvider() {
+    public AuthenticationProvider casAuthenticationProvider() {
         CasAuthenticationProvider casAuthenticationProvider = new CasAuthenticationProvider();
         casAuthenticationProvider.setAuthenticationUserDetailsService(authenticationUserDetailsService());
         casAuthenticationProvider.setServiceProperties(serviceProperties());
@@ -71,14 +72,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public Cas20ServiceTicketValidator cas20ServiceTicketValidator() {
         return new Cas20ServiceTicketValidator(casServer);
-    }
-
-    @Bean
-    public CasAuthenticationFilter casAuthenticationFilter() throws Exception {
-        CasAuthenticationFilter casAuthenticationFilter = new CasAuthenticationFilter();
-        casAuthenticationFilter.setAuthenticationManager(authenticationManager());
-        casAuthenticationFilter.setFilterProcessesUrl("/j_spring_cas_security_check");
-        return casAuthenticationFilter;
     }
 
     @Bean

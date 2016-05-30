@@ -20,49 +20,14 @@ public class UserResource {
     private HttpServletRequest httpRequest;
 
     @GET
-    @Path("/user")
+    @Path("users")
     @Produces(MediaType.APPLICATION_JSON)
-    public AppUser view(@QueryParam("id") int id, @QueryParam("name") String name) {
-        return new AppUser(id, name == null ? "who-pa-who" : name);
-    }
-
-    @GET
-    @Path("/users")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<AppUser> views(@QueryParam("id") @DefaultValue("5") int id, @QueryParam("inputName") @RequestParam(required = false) String name) {
-//        System.out.println(buildHead());
-
-        ArrayList<AppUser> list = new ArrayList();
-        AppUser appUser = new AppUser();
-        appUser.setId(id);
-        appUser.setName("zhang");
-
-        AppUser u2 = new AppUser(id + 1, "wang");
-
+    public List<AppUser> appUsers() {
+        AppUser appUser = new AppUser(1, "张三2");
+        AppUser appUser2 = new AppUser(2, "李四2");
+        List<AppUser> list = new ArrayList<>();
         list.add(appUser);
-        list.add(u2);
-
-        if (name != null) {
-            AppUser u3 = new AppUser(id + 2, name);
-            ArrayList<String> sList = new ArrayList<>();
-            sList.add("one");
-            sList.add("two");
-            u3.setList(sList);
-            list.add(u3);
-        }
+        list.add(appUser2);
         return list;
     }
-
-    @GET
-    @Path("/hi")
-    public String hi() {
-//        System.out.println(buildHead());
-        return "Hi. Hi. Hi";
-    }
-
-//    public Map<String, Object> buildHead() {
-//        CasAuthenticationToken casAuthenticationToken = (CasAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-//        AttributePrincipal principal = casAuthenticationToken.getAssertion().getPrincipal();
-//        return principal.getAttributes();
-//    }
 }

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.mine</groupId>
-    <artifactId>AppA</artifactId>
+    <artifactId>api-proxy</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
@@ -62,7 +62,11 @@
             <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+            <version>1.1.0.BUILD-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
