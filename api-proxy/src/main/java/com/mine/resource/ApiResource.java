@@ -32,6 +32,14 @@ public class ApiResource {
     private DiscoveryClient discovery;
 
     @GET
+    @Path("health")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String  getHealth() {
+        return "Health: OK";
+    }
+
+
+    @GET
     @Path("users")
     @Produces(MediaType.APPLICATION_JSON)
     public List<AppUser> appAUsers() {
