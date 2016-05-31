@@ -35,6 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilter(casAuthenticationFilter());
         http.authorizeRequests().antMatchers("/rest/**").authenticated();
         http.authorizeRequests().antMatchers("/health/**").permitAll();
+        http.authorizeRequests().anyRequest().authenticated();
         http.exceptionHandling().authenticationEntryPoint(casAuthenticationEntryPoint());
     }
 
