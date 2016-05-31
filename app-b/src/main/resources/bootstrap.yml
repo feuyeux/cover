@@ -1,6 +1,6 @@
 spring:
   application:
-    name: app-a
+    name: app-b
   cloud:
     zookeeper:
       connectString: localhost:2181
