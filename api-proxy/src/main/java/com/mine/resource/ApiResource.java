@@ -80,12 +80,14 @@ public class ApiResource {
         }
         /*数据处理*/
         if (appAUserList != null) {
-            if (allow.contains("ALL"))
+            if (allow.contains("ALL")) {
                 result.addAll(appAUserList);
+            }
         }
         if (appBUserList != null) {
-            if (allow.contains("ALL"))
+            if (allow.contains("ALL")) {
                 result.addAll(appBUserList);
+            }
         }
         return result;
     }
