@@ -21,6 +21,8 @@ import org.springframework.security.core.userdetails.AuthenticationUserDetailsSe
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${api.server}")
     private String apiServer;
+    @Value("${server.port}")
+    private String apiServerPort;
 
     @Value("${cas.server}")
     private String casServer;
@@ -33,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilter(casAuthenticationFilter());
-        http.authorizeRequests().antMatchers("/rest/**").authenticated();
+        http.authorizeRequests().antMatchers("/rest/**").hasAnyAuthority("ROLE_A,ROLE_B");
         http.authorizeRequests().antMatchers("/health/**").permitAll();
         http.authorizeRequests().anyRequest().authenticated();
         http.exceptionHandling().authenticationEntryPoint(casAuthenticationEntryPoint());
@@ -50,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public ServiceProperties serviceProperties() {
         ServiceProperties serviceProperties = new ServiceProperties();
-        serviceProperties.setService(apiServer + "/j_spring_cas_security_check");
+        serviceProperties.setService(apiServer +":"+apiServerPort+ "/j_spring_cas_security_check");
         serviceProperties.setSendRenew(false);
         return serviceProperties;
     }
@@ -67,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationUserDetailsService authenticationUserDetailsService() {
-        return new MyCasAuthenticationUserDetailsService();
+        return new CasUserDetailsService();
     }
 
     @Bean

@@ -1,11 +1,14 @@
 package com.mine.resource;
 
 import com.mine.domain.AppUser;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +26,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @Path("/")
 public class ApiResource {
+    private static final Logger logger = LogManager.getLogger(ApiResource.class);
     @Context
     private HttpServletRequest httpRequest;
 
@@ -42,29 +47,46 @@ public class ApiResource {
         return "Health: OK";
     }
 
-
+    /**
+     * https://localhost:8011/rest/users
+     * @return
+     */
     @GET
-    @Path("users")
+    @Path("rest/users")
     @Produces(MediaType.APPLICATION_JSON)
     public List<AppUser> appAUsers() {
         List<AppUser> result = new ArrayList<>();
         /*授权处理*/
         CasAuthenticationToken casAuthenticationToken = (CasAuthenticationToken) httpRequest.getUserPrincipal();
         Map<String, Object> map = getAttributes();
+        Collection<? extends GrantedAuthority> authorities = casAuthenticationToken.getUserDetails().getAuthorities();
+        String allow = (String) map.get("ruleallow");
+        String deny = (String) map.get("ruledeny");
 
         /*服务实例处理*/
         List<ServiceInstance> appAInstances = getAppInstaces("app-a");
         List<ServiceInstance> appBInstances = getAppInstaces("app-b");
 
         /*请求处理*/
-        URI appAUri = appAInstances.get(0).getUri();
-        List<AppUser> appAUserList = getAppUsers(appAUri);
-        URI appBUri = appBInstances.get(0).getUri();
-        List<AppUser> appBUserList = getAppUsers(appBUri);
-
+        List<AppUser> appAUserList = null;
+        List<AppUser> appBUserList = null;
+        if (authorities.contains("ROLE_A")) {
+            URI appAUri = appAInstances.get(0).getUri();
+            appAUserList = getAppUsers(appAUri);
+        }
+        if (authorities.contains("ROLE_B")) {
+            URI appBUri = appBInstances.get(0).getUri();
+            appBUserList = getAppUsers(appBUri);
+        }
         /*数据处理*/
-        result.addAll(appAUserList);
-        result.addAll(appBUserList);
+        if (appAUserList != null) {
+            if (allow.contains("ALL"))
+                result.addAll(appAUserList);
+        }
+        if (appBUserList != null) {
+            if (allow.contains("ALL"))
+                result.addAll(appBUserList);
+        }
         return result;
     }
 
@@ -89,6 +111,7 @@ public class ApiResource {
             AttributePrincipal principal = casAuthenticationToken.getAssertion().getPrincipal();
             return principal.getAttributes();
         } catch (Exception e) {
+            logger.error("Fail to get authentication info", e);
             return null;
         }
     }
