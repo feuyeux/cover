@@ -12,3 +12,6 @@ keytool -importkeystore -srckeystore .keystore -destkeystore server.p12 -srcstor
 openssl pkcs12 -in server.p12 -nocerts -out server.key
 openssl pkcs12 -in server.p12 -nodes -out server.pem
 ```
+
+# 验证
+https://myServer:8010/users
