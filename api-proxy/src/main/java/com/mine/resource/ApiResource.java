@@ -9,6 +9,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,8 @@ import java.util.Map;
 @Path("/")
 public class ApiResource {
     private static final Logger logger = LogManager.getLogger(ApiResource.class);
+    private static final GrantedAuthority ROLE_A = new SimpleGrantedAuthority("ROLE_A");
+    private static final GrantedAuthority ROLE_B = new SimpleGrantedAuthority("ROLE_B");
     @Context
     private HttpServletRequest httpRequest;
 
@@ -49,6 +52,7 @@ public class ApiResource {
 
     /**
      * https://localhost:8011/rest/users
+     *
      * @return
      */
     @GET
@@ -70,11 +74,11 @@ public class ApiResource {
         /*请求处理*/
         List<AppUser> appAUserList = null;
         List<AppUser> appBUserList = null;
-        if (authorities.contains("ROLE_A")) {
+        if (!appAInstances.isEmpty() && authorities.contains(ROLE_A)) {
             URI appAUri = appAInstances.get(0).getUri();
             appAUserList = getAppUsers(appAUri);
         }
-        if (authorities.contains("ROLE_B")) {
+        if (!appBInstances.isEmpty() && authorities.contains(ROLE_B)) {
             URI appBUri = appBInstances.get(0).getUri();
             appBUserList = getAppUsers(appBUri);
         }
