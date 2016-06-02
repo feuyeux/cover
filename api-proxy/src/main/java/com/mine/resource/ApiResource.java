@@ -43,6 +43,9 @@ public class ApiResource {
     @Autowired
     private DiscoveryClient discovery;
 
+
+    static int appARestUsersCount = 0;
+
     @GET
     @Path("health")
     @Produces(MediaType.APPLICATION_JSON)
@@ -71,11 +74,14 @@ public class ApiResource {
         List<ServiceInstance> appAInstances = getAppInstaces("app-a");
         List<ServiceInstance> appBInstances = getAppInstaces("app-b");
 
+        int index = appARestUsersCount%appAInstances.size();
+        appARestUsersCount++;
+
         /*请求处理*/
         List<AppUser> appAUserList = null;
         List<AppUser> appBUserList = null;
         if (!appAInstances.isEmpty() && authorities.contains(ROLE_A)) {
-            URI appAUri = appAInstances.get(0).getUri();
+            URI appAUri = appAInstances.get(index).getUri();
             appAUserList = getAppUsers(appAUri);
         }
         if (!appBInstances.isEmpty() && authorities.contains(ROLE_B)) {
