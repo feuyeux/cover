@@ -14,4 +14,4 @@ openssl pkcs12 -in server.p12 -nodes -out server.pem
 ```
 
 # 验证
-https://myServer:8010/users
+https://myServer:8010/rest/users
