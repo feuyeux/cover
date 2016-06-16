@@ -39,4 +39,12 @@ public class AppUser {
         this.list = list;
     }
 
+    @Override
+    public String toString() {
+        return "AppUser{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", list=" + list +
+                '}';
+    }
 }

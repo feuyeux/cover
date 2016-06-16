@@ -74,7 +74,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public Cas20ServiceTicketValidator cas20ServiceTicketValidator() {
-        return new Cas20ServiceTicketValidator(casServer);
+        Cas20ServiceTicketValidator cas20ServiceTicketValidator = new Cas20ServiceTicketValidator(casServer);
+        cas20ServiceTicketValidator.setEncoding("UTF-8");
+        return cas20ServiceTicketValidator;
     }
 
     @Bean

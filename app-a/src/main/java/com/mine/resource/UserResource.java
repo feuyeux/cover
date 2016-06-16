@@ -23,8 +23,8 @@ public class UserResource {
     @Path("users")
     @Produces(MediaType.APPLICATION_JSON)
     public List<AppUser> appUsers() {
-        AppUser appUser = new AppUser(1, "张三");
-        AppUser appUser2 = new AppUser(2, "李四");
+        AppUser appUser = new AppUser(1, "张三a-1");
+        AppUser appUser2 = new AppUser(2, "李四a-1");
         List<AppUser> list =new ArrayList<>();
         list.add(appUser);
         list.add(appUser2);

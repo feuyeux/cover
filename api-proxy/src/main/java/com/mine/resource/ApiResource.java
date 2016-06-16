@@ -45,6 +45,10 @@ public class ApiResource {
     @Autowired
     private DiscoveryClient discovery;
 
+
+    static int appARestUsersCount = 0;
+    static int appBRestUsersCount = 0;
+
     @GET
     @Path("health")
     @Produces(MediaType.APPLICATION_JSON)
@@ -73,15 +77,21 @@ public class ApiResource {
         List<ServiceInstance> appAInstances = getAppInstaces("app-a");
         List<ServiceInstance> appBInstances = getAppInstaces("app-b");
 
+        /*轮询访问app */
+        int indexA = appARestUsersCount % appAInstances.size();
+        appARestUsersCount++;
+        int indexB = appBRestUsersCount % appBInstances.size();
+        appBRestUsersCount++;
+
         /*请求处理*/
         List<AppUser> appAUserList = null;
         List<AppUser> appBUserList = null;
         if (!appAInstances.isEmpty() && authorities.contains(ROLE_A)) {
-            URI appAUri = appAInstances.get(0).getUri();
+            URI appAUri = appAInstances.get(indexA).getUri();
             appAUserList = getAppUsers(appAUri);
         }
         if (!appBInstances.isEmpty() && authorities.contains(ROLE_B)) {
-            URI appBUri = appBInstances.get(0).getUri();
+            URI appBUri = appBInstances.get(indexB).getUri();
             appBUserList = getAppUsers(appBUri);
         }
 
@@ -93,17 +103,61 @@ public class ApiResource {
         }
 
         /*数据处理*/
-        if (appAUserList != null) {
-            if (allow.contains("ALL")) {
-                result.addAll(appAUserList);
-            }
+        List<AppUser> retList = getListByRule(allow, deny, appAUserList);
+        if ((retList != null) && (!retList.isEmpty())) {
+            result.addAll(retList);
         }
-        if (appBUserList != null) {
-            if (allow.contains("ALL")) {
-                result.addAll(appBUserList);
-            }
+
+        retList = getListByRule(allow, deny, appBUserList);
+        if ((retList != null) && (!retList.isEmpty())) {
+            result.addAll(retList);
         }
+
         return result;
+    }
+
+    List<AppUser> getListByRule(String allow, String deny, List<AppUser> appList) {
+        List<AppUser> retList = new ArrayList<>();
+        if (appList == null) {
+            return null;
+        }
+
+        if(allow != null){
+            if (allow.contains("ALL")) {
+                retList.addAll(appList);
+            } else {
+                String[] allowList = {allow};
+                if(allow.contains(",")){
+                    allowList = allow.split(",");
+                }
+                for (int i = 0; i < appList.size(); i++) {
+                    AppUser appUser = appList.get(i);
+                    for (int j = 0; j < allowList.length; j++) {
+                        if (appUser.toString().contains(allowList[j])) {
+                            retList.add(appUser);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (deny != null) {
+            String[] denyList = {deny};
+            if (deny.contains(",")) {
+                denyList = deny.split(",");
+            }
+
+            for (int i = 0; i < appList.size(); i++) {
+                AppUser appUser = appList.get(i);
+                for (int j = 0; j < denyList.length; j++) {
+                    if (appUser.toString().contains(denyList[j])) {
+                        retList.remove(appUser);
+                    }
+                }
+            }
+        }
+
+        return retList;
     }
 
     private List<AppUser> getAppUsers(URI appAUri) {
