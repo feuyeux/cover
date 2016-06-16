@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Path("/")
@@ -45,9 +46,7 @@ public class ApiResource {
     @Autowired
     private DiscoveryClient discovery;
 
-
-    static int appARestUsersCount = 0;
-    static int appBRestUsersCount = 0;
+    private AtomicInteger counter = new AtomicInteger();
 
     @GET
     @Path("health")
@@ -78,10 +77,9 @@ public class ApiResource {
         List<ServiceInstance> appBInstances = getAppInstaces("app-b");
 
         /*轮询访问app */
-        int indexA = appARestUsersCount % appAInstances.size();
-        appARestUsersCount++;
-        int indexB = appBRestUsersCount % appBInstances.size();
-        appBRestUsersCount++;
+        int i = Math.abs(counter.incrementAndGet());
+        int indexA = i % appAInstances.size();
+        int indexB = i % appBInstances.size();
 
         /*请求处理*/
         List<AppUser> appAUserList = null;
@@ -122,12 +120,12 @@ public class ApiResource {
             return null;
         }
 
-        if(allow != null){
+        if (allow != null) {
             if (allow.contains("ALL")) {
                 retList.addAll(appList);
             } else {
                 String[] allowList = {allow};
-                if(allow.contains(",")){
+                if (allow.contains(",")) {
                     allowList = allow.split(",");
                 }
                 for (int i = 0; i < appList.size(); i++) {
@@ -184,5 +182,13 @@ public class ApiResource {
             logger.error("Fail to get authentication info", e);
             return null;
         }
+    }
+
+    public static void main(String[] args) {
+        AtomicInteger atomicInteger = new AtomicInteger(Integer.MAX_VALUE);
+        System.out.println(atomicInteger.get());
+        System.out.println(atomicInteger.incrementAndGet());
+        System.out.println(atomicInteger.incrementAndGet());
+        System.out.println(Integer.MIN_VALUE);
     }
 }
